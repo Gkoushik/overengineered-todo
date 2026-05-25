@@ -1,0 +1,56 @@
+{
+  "title": "System Overview - Overengineered TODO",
+  "uid": "system-overview",
+  "schemaVersion": 38,
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Requests/sec by Service",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [{ "expr": "rate(http_requests_total[1m])", "legendFormat": "{{job}}" }]
+    },
+    {
+      "id": 2,
+      "title": "P99 Latency by Service",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [{
+        "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))",
+        "legendFormat": "{{job}}"
+      }]
+    },
+    {
+      "id": 3,
+      "title": "Tasks Created (Total)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+      "targets": [{ "expr": "tasks_created_total" }]
+    },
+    {
+      "id": 4,
+      "title": "Tasks Completed (Total)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+      "targets": [{ "expr": "tasks_completed_total" }]
+    },
+    {
+      "id": 5,
+      "title": "Active Pods",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+      "targets": [{ "expr": "count(up == 1)" }]
+    },
+    {
+      "id": 6,
+      "title": "Error Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "targets": [{
+        "expr": "rate(http_requests_total{status=~\"5..\"}[1m])",
+        "legendFormat": "{{job}} - {{status}}"
+      }]
+    }
+  ]
+}

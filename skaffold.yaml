@@ -1,0 +1,93 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: overengineered-todo
+
+build:
+  local:
+    push: false
+  artifacts:
+    - image: overengineered-todo/api-gateway
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.api-gateway
+    - image: overengineered-todo/task-service
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.task-service
+    - image: overengineered-todo/auth-service
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.auth-service
+    - image: overengineered-todo/notification-service
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.notification-service
+    - image: overengineered-todo/ai-service
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.ai-service
+    - image: overengineered-todo/search-service
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.search-service
+    - image: overengineered-todo/analytics-service
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.analytics-service
+    - image: overengineered-todo/blockchain-service
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.blockchain-service
+    - image: overengineered-todo/frontend
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.frontend
+    - image: overengineered-todo/hardhat
+      context: .
+      docker:
+        dockerfile: infra/docker/Dockerfile.hardhat
+
+deploy:
+  kubectl:
+    manifests:
+      - infra/k8s/namespace.yaml
+      - infra/k8s/infra/*.yaml
+      - infra/k8s/services/*.yaml
+      - infra/k8s/ingress.yaml
+  helm:
+    releases:
+      - name: prometheus
+        remoteChart: prometheus-community/prometheus
+        namespace: overengineered-todo
+        createNamespace: false
+        valuesFiles:
+          - infra/monitoring/prometheus-values.yaml
+      - name: grafana
+        remoteChart: grafana/grafana
+        namespace: overengineered-todo
+        createNamespace: false
+        valuesFiles:
+          - infra/monitoring/grafana-values.yaml
+
+portForward:
+  - resourceType: service
+    resourceName: frontend
+    namespace: overengineered-todo
+    port: 4000
+    localPort: 4000
+  - resourceType: service
+    resourceName: api-gateway
+    namespace: overengineered-todo
+    port: 3000
+    localPort: 3000
+  - resourceType: service
+    resourceName: mailhog
+    namespace: overengineered-todo
+    port: 8025
+    localPort: 8025
+  - resourceType: service
+    resourceName: grafana
+    namespace: overengineered-todo
+    port: 80
+    localPort: 3100

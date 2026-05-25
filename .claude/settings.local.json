@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4000)",
+      "PowerShell(cd \"d:\\\\Workplace\\\\overengineered-todo\"; Start-Process -NoNewWindow -FilePath \"npm\" -ArgumentList \"run\",\"dev\",\"--workspace=frontend\" -RedirectStandardOutput \"$env:TEMP\\\\frontend-out.txt\" -RedirectStandardError \"$env:TEMP\\\\frontend-err.txt\")",
+      "PowerShell($npmPath = \\(Get-Command npm\\).Source; Write-Host $npmPath)",
+      "PowerShell($npmCmd = \\(Get-Command npm.cmd -ErrorAction SilentlyContinue\\).Source; Write-Host $npmCmd)"
+    ]
+  }
+}

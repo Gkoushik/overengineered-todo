@@ -1,0 +1,43 @@
+{
+  "title": "Task Pipeline - End to End",
+  "uid": "task-pipeline",
+  "schemaVersion": 38,
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Task Creation Cascade (requests/min through each service)",
+      "type": "timeseries",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "rate(http_requests_total{job=\"task-service\", method=\"POST\"}[1m]) * 60", "legendFormat": "1. Task Created" },
+        { "expr": "rate(http_requests_total{job=\"ai-service\"}[1m]) * 60", "legendFormat": "2. AI Prioritized" },
+        { "expr": "rate(http_requests_total{job=\"search-service\"}[1m]) * 60", "legendFormat": "3. Indexed" },
+        { "expr": "rate(http_requests_total{job=\"notification-service\"}[1m]) * 60", "legendFormat": "4. Notified" },
+        { "expr": "rate(http_requests_total{job=\"analytics-service\"}[1m]) * 60", "legendFormat": "5. Tracked" },
+        { "expr": "rate(http_requests_total{job=\"blockchain-service\"}[1m]) * 60", "legendFormat": "6. Minted" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Tasks Created Total",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 10 },
+      "targets": [{ "expr": "tasks_created_total" }]
+    },
+    {
+      "id": 3,
+      "title": "Tasks Completed Total",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 10 },
+      "targets": [{ "expr": "tasks_completed_total" }]
+    },
+    {
+      "id": 4,
+      "title": "Blockchain Mints/sec",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 10 },
+      "targets": [{ "expr": "rate(http_requests_total{job=\"blockchain-service\"}[5m])" }]
+    }
+  ]
+}

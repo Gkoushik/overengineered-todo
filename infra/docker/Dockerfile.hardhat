@@ -1,0 +1,8 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY blockchain/package.json blockchain/package-lock.json* ./
+RUN npm ci
+COPY blockchain/ .
+RUN npx hardhat compile
+EXPOSE 8545
+CMD ["npx", "hardhat", "node", "--hostname", "0.0.0.0"]

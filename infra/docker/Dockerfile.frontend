@@ -1,0 +1,17 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY packages/shared/ packages/shared/
+COPY frontend/ frontend/
+RUN npm ci
+RUN npm run build --workspace=packages/shared
+RUN npm run build --workspace=frontend
+
+FROM node:20-alpine
+WORKDIR /app/frontend
+COPY --from=builder /app/frontend/.next .next
+COPY --from=builder /app/frontend/public public 2>/dev/null || true
+COPY --from=builder /app/frontend/package.json .
+COPY --from=builder /app/frontend/node_modules node_modules
+EXPOSE 4000
+CMD ["npm", "start"]
