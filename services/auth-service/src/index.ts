@@ -1,5 +1,7 @@
 import express from 'express';
 import { healthRouter } from './health';
+import { authRouter } from './routes';
+import { connectRedis } from './redis';
 import { httpRequestsTotal, httpRequestDuration } from './metrics';
 
 const app = express();
@@ -17,7 +19,13 @@ app.use((req, res, next) => {
 });
 
 app.use(healthRouter);
+app.use(authRouter);
 
-app.listen(PORT, () => {
-  console.log(`[auth-service] Running on port ${PORT}`);
-});
+async function start() {
+  await connectRedis();
+  app.listen(PORT, () => {
+    console.log(`[auth-service] Running on port ${PORT}`);
+  });
+}
+
+start().catch(console.error);
