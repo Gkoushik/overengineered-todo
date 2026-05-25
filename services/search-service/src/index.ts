@@ -1,5 +1,8 @@
 import express from 'express';
 import { healthRouter } from './health';
+import { searchRouter } from './routes';
+import { initIndex } from './elasticsearch';
+import { startConsumer } from './consumer';
 import { httpRequestsTotal, httpRequestDuration } from './metrics';
 
 const app = express();
@@ -17,7 +20,14 @@ app.use((req, res, next) => {
 });
 
 app.use(healthRouter);
+app.use(searchRouter);
 
-app.listen(PORT, () => {
-  console.log(`[search-service] Running on port ${PORT}`);
-});
+async function start() {
+  await initIndex();
+  await startConsumer();
+  app.listen(PORT, () => {
+    console.log(`[search-service] Running on port ${PORT}`);
+  });
+}
+
+start().catch(console.error);

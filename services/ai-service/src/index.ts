@@ -1,5 +1,7 @@
 import express from 'express';
 import { healthRouter } from './health';
+import { aiRouter } from './routes';
+import { startConsumer } from './consumer';
 import { httpRequestsTotal, httpRequestDuration } from './metrics';
 
 const app = express();
@@ -17,7 +19,13 @@ app.use((req, res, next) => {
 });
 
 app.use(healthRouter);
+app.use(aiRouter);
 
-app.listen(PORT, () => {
-  console.log(`[ai-service] Running on port ${PORT}`);
-});
+async function start() {
+  await startConsumer();
+  app.listen(PORT, () => {
+    console.log(`[ai-service] Running on port ${PORT}`);
+  });
+}
+
+start().catch(console.error);

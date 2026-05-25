@@ -1,5 +1,8 @@
 import express from 'express';
 import { healthRouter } from './health';
+import { taskRouter } from './routes';
+import { initDb } from './db';
+import { initProducer } from './producer';
 import { httpRequestsTotal, httpRequestDuration } from './metrics';
 
 const app = express();
@@ -17,7 +20,14 @@ app.use((req, res, next) => {
 });
 
 app.use(healthRouter);
+app.use(taskRouter);
 
-app.listen(PORT, () => {
-  console.log(`[task-service] Running on port ${PORT}`);
-});
+async function start() {
+  await initDb();
+  await initProducer();
+  app.listen(PORT, () => {
+    console.log(`[task-service] Running on port ${PORT}`);
+  });
+}
+
+start().catch(console.error);

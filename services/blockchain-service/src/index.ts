@@ -1,5 +1,7 @@
 import express from 'express';
 import { healthRouter } from './health';
+import { initContract } from './contract';
+import { startConsumer } from './consumer';
 import { httpRequestsTotal, httpRequestDuration } from './metrics';
 
 const app = express();
@@ -18,6 +20,12 @@ app.use((req, res, next) => {
 
 app.use(healthRouter);
 
-app.listen(PORT, () => {
-  console.log(`[blockchain-service] Running on port ${PORT}`);
-});
+async function start() {
+  await initContract();
+  await startConsumer();
+  app.listen(PORT, () => {
+    console.log(`[blockchain-service] Running on port ${PORT}`);
+  });
+}
+
+start().catch(console.error);
